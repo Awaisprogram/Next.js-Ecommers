@@ -1,101 +1,97 @@
 "use client";
 
-import { useCart } from "@/app/cartContext";
+import {
+  FaHeart,
+  FaShoppingCart,
+} from "react-icons/fa";
 import Link from "next/link";
-import { FaSearch } 
-from "react-icons/fa";
-import { GiHamburgerMenu } from "react-icons/gi";
-import { IoCartOutline,IoSearchOutline,IoLogoDeviantart,IoHeartOutline } from "react-icons/io5";
-
-import { FaAngleDown } from "react-icons/fa6";
-
-
-
 import { useState } from "react";
+import { IoIosArrowDown } from "react-icons/io";
+import { useCart } from "../cartContext";
+import { SignInButton, UserButton, useUser } from "@clerk/nextjs";
+import SearchBar from "./searchbar";
 
 const Navbar = () => {
   const { cartItemCount } = useCart();
-  const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+
+  // Get user state
+  const { isSignedIn, user } = useUser();
+  const isAdmin = user?.publicMetadata?.role === "admin";
+
+  const toggleMobileMenu = () => {
+    setMobileMenuOpen(!mobileMenuOpen);
+  };
 
   return (
-    <nav className="bg-white shadow-md">
-      <div className="container mx-auto px-4 py-6 flex justify-between items-center border-b">
-        <div className="flex gap-6 items-center text-3xl font-black text-color">
-          <button
-            className="md:hidden focus:outline-none"
-            onClick={() => setIsMenuOpen(!isMenuOpen)}
-          >
-           <GiHamburgerMenu />
-          </button> 
-          <Link href="/" className="flex items-center gap-1"> <IoLogoDeviantart className="lg:block hidden"/>ShopShere</Link>
-        </div>
+    <nav className="bg-Background max-w-[1437px] lg:h-[78px] flex justify-between items-center relative z-20">
+      <div className="container mx-auto p-4 flex justify-between items-center">
+        {/* Brand Name */}
+        <div className="flex justify-center items-center gap-20">
+          <Link href="/" className="text-2xl font-black text-black">
+            Bandage
+          </Link>
 
-        <ul className="hidden md:flex gap-6">
-          <li>
-            <Link
-              href="/"
-              className="text-lg text-gray-700 transition ease-in hover:text-color duration-300"
-            >
+          {/* Navbar Links - Desktop Version */}
+          <div className="hidden lg:flex text-sm space-x-8">
+            <Link href="/" className="font-bold hover:text-Color transition ease duration-500">
               Home
             </Link>
-          </li>
-          <li>
-            <a
-              href="#sales"
-              className="scroll flex items-center gap-1 text-lg text-gray-700 transition ease-in hover:text-color duration-300"
-            >
-              Sales <FaAngleDown/>
-            </a>
-          </li>
-          
-          <li>
             <Link
               href="/shop"
-              className="text-lg flex items-center gap-1 text-gray-700 transition ease-in hover:text-color duration-300"
+              className="hover:text-Color font-bold flex justify-center items-center gap-4 transition ease duration-500"
             >
-              Shop
+              Shop <IoIosArrowDown />
             </Link>
-          </li>
-          
-          <li>
-            <Link
-              href="/about"
-              className="text-lg text-gray-700 transition ease-in hover:text-color duration-300"
-            >
+            <Link href="/about" className="hover:text-Color font-bold transition ease duration-500">
               About
             </Link>
-          </li>
-          <li>
-            <a
-              href="#news"
-              className="scroll text-lg text-gray-700 flex items-center gap-1 transition ease-in hover:text-color duration-300"
-            >
-              News <FaAngleDown/>
-            </a>
-          </li>
-          
-        </ul>
-
-        <div className="hidden lg:flex items-center space-x-4">
-          <div className="relative">
-            <input
-              type="text"
-              placeholder="Search for yourself.."
-              className="border border-gray-300 bg-gray-100 rounded-xl  px-4 py-2 pl-10 w-[350px] focus:outline-none focus:border-color focus:bg-white trasition all duration-100 ease"
-            />
-            <FaSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500" />
+            <Link href="/contact" className="hover:text-Color font-bold transition ease duration-500">
+              Contact
+            </Link>
+            <Link href="/support" className="hover:text-Color font-bold transition ease duration-500">
+              Pages
+            </Link>
+            <Link href="/pricing" className="hover:text-Color font-bold transition ease duration-500">
+              Pricings
+            </Link>
+            {isAdmin && (
+              <Link href="/admin" className="hover:text-red-500 font-bold transition ease duration-500">
+                Admin
+              </Link>
+            )}
           </div>
         </div>
 
-        <div className="flex space-x-4 items-center">
-         
-          <button className="lg:hidden transition ease-in hover:text-color">
-            <IoSearchOutline size={28} />
-          </button>
+        {/* User Login/Signup */}
+        <div className="lg:flex items-center space-x-4 hidden text-Color">
+          <div className="flex items-center space-x-4">
+            <SearchBar />
+            <FaHeart className="text-xl text-Color cursor-pointer" />
+            <button className="relative transition ease-in hover:text-color">
+              <Link href="/cartpage">
+                <FaShoppingCart className="text-xl text-Color cursor-pointer" />
+                {cartItemCount > 0 && (
+                  <span className="absolute top-0 right-0 text-xs text-white p-2 bg-red-500 rounded-full w-3 h-3 flex items-center justify-center">
+                    {cartItemCount}
+                  </span>
+                )}
+              </Link>
+            </button>
+          </div>
 
+          {!isSignedIn && <SignInButton />}
+          {isSignedIn && <UserButton />}
+        </div>
+
+        {/* Mobile Menu Button (Hamburger Icon) */}
+        <div className="lg:hidden flex items-center space-x-4">
+          {!isSignedIn && <SignInButton />}
+          {isSignedIn && <UserButton />}
+          <SearchBar />
           <button className="relative transition ease-in hover:text-color">
-            <Link href="/cart">
-              <IoCartOutline size={28} />
+            <Link href="/cartpage">
+              <FaShoppingCart className="text-xl cursor-pointer hover:text-Color" />
               {cartItemCount > 0 && (
                 <span className="absolute top-0 right-0 text-xs text-white p-2 bg-red-500 rounded-full w-3 h-3 flex items-center justify-center">
                   {cartItemCount}
@@ -104,76 +100,63 @@ const Navbar = () => {
             </Link>
           </button>
 
-          <button className="transition ease-in hover:text-color hidden lg:block">
-            <IoHeartOutline size={28} 
-            />
+          {/* Hamburger Icon */}
+          <button className="text-xl" onClick={toggleMobileMenu}>
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              className="h-6 w-6"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth="2"
+                d="M4 6h16M4 12h16m-7 6h7"
+              />
+            </svg>
           </button>
         </div>
       </div>
 
+      {/* Mobile Dropdown Menu */}
       <div
-        className={`fixed top-0 left-0 h-full w-72 bg-gray-100 transform ${
-          isMenuOpen ? "translate-x-0" : "-translate-x-full"
-        } transition-transform duration-300 ease-in-out z-50`}
-      >
-        <button
-          className="absolute top-4 right-4 text-black font-bold text-xl"
-          onClick={() => setIsMenuOpen(false)}
-        >
-          ✕
-        </button>
-        <ul className="flex flex-col items-center mt-52 space-y-6">
-          <li>
-            <Link
-              href="/"
-              className="block text-lg transition ease-in hover:text-color duration-300"
-            >
-              Home
-            </Link>
-          </li>
-          <li>
-            <a
-              href="#sales"
-              className="scroll block text-lg transition ease-in hover:text-color"
-            >
-              Sales 
-            </a>
-          </li>
-          
-          <li>
-            <Link
-              href="/shop"
-              className="block text-lg transition ease-in hover:text-color duration-300"
-            >
-              Shop
-            </Link>
-          </li>
-          <li>
-            <Link
-              href="/about"
-              className="block text-lg transition ease-in hover:text-color duration-300"
-            >
-              About
-            </Link>
-          </li>
-          <li>
-            <a
-              href="#news"
-             className="scroll block text-lg transition ease-in hover:text-color duration-300 "
-            >
-              News 
-            </a>
-          </li>
-          
-        </ul>
-      </div>
+  className={`lg:hidden fixed top-0 left-0 h-full bg-Background text-light w-3/4 max-w-sm p-6 flex flex-col justify-center items-center transition-transform duration-300 ease-in-out z-30 ${
+    mobileMenuOpen ? "translate-x-0" : "-translate-x-full"
+  }`}
+>
+  <button
+    className="absolute top-4 right-4 text-black text-2xl"
+    onClick={toggleMobileMenu}
+  >
+    &times;
+  </button>
+  <Link href="/" className="block py-2 font-semibold hover:text-Color">
+    Home
+  </Link>
+  <Link href="/shop" className="block py-2 font-semibold hover:text-Color">
+    Shop
+  </Link>
+  <Link href="/about" className="block py-2 font-semibold hover:text-Color">
+    About
+  </Link>
+  <Link href="/contact" className="block py-2 font-semibold hover:text-Color">
+    Contact
+  </Link>
+  <Link href="/support" className="block py-2 font-semibold hover:text-Color">
+    Pages
+  </Link>
+  <Link href="/pricing" className="block py-2 font-semibold hover:text-Color">
+    Pricings
+  </Link>
+  {isAdmin && (
+    <Link href="/admin" className="block py-2 font-semibold hover:text-red-500">
+      Admin
+    </Link>
+  )}
+</div>
 
-      {isMenuOpen && (
-        <div
-          className="fixed inset-0 bg-black bg-opacity-50 z-40"
-          onClick={() => setIsMenuOpen(false)}
-        ></div>
-      )}
     </nav>
   );
 };
